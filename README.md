@@ -36,7 +36,7 @@ Required/Optional libraries
 
 
 ## Installation
-*	make depends<br>
+*	make depend<br>
 Generate the module dependencies of FVCOM codes. This step is required only when there are new codes added.
 *	edit make.inc<br>
 The ‘make.inc’ file includes all the settings for compiling FVCOM. This file needs to be edited correctly based on users’ interest of simulation, before the FVCOM codes are compiled. Users need to edit three parts in this file, including library environments, control flags, and compiler settings. 
