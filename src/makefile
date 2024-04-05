@@ -26,6 +26,8 @@
 # $Revision$
 #/===========================================================================/
 
+include ./make.inc
+
 #-----------BEGIN MAKEFILE-------------------------------------------------
             SHELL         = /bin/sh
             EXEC          = fvcom
@@ -100,7 +102,7 @@ MAIN  =	fvcom.F		genmap.F	tge.F		longshore_flow.F\
 	adv_uv_edge_gcy.F  vdif_uv.F    extelpf_edge.F	wreal.F		\
 	viscofh.F	adv_q.F		fct_q2.F	fct_q2l.F	\
 	vdif_q.F	adv_t.F		adv_s.F		fct_t.F		\
-	vdif_ts.F	vdif_ts_gom.F	fct_s.F		bcond_ts.F	\
+	vdif_ts.F	fct_s.F		bcond_ts.F	\
 	adjust_ts.F	conv_over.F	visitsim.F	startup_type.F	\
 	edge_len.F	adcor.F		icing.F		rho_pmean.F	\
 	calc_vort.F	namelist.F	nh_set_nesting.F		\
@@ -113,11 +115,7 @@ MAIN_W = ocpmix.F	ocpcre.F	ocpids.F	\
 	swancom1.F	swancom2.F	swancom3.F	swancom4.F	\
 	swancom5.F	w3part.F
 
-#ifdef FLAG_411
-  COBJS = func_pointer.c partition.c
-#else
-#  COBJS = func_pointer.c
-#endif
+COBJS = $(if $(FLAG_411), func_pointer.c partition.c, func_pointer.c)
 
 BIOGEN	= mod_bio_3D.F	mod_onedtide.F
 
@@ -182,10 +180,9 @@ tarfile:
 clean:
 		/bin/rm -f *.o *.mod *.f90 fvcom libfvcom.a
 
-clobber: clean
-	 /bin/rm -f fvcom libfvcom.so libfvcom.a
-
-distclean: clobber
+clobber:	
+		make clean
+		/bin/rm -f fvcom libfvcom.so libfvcom.a postFVCOM_ncnest_reorder
 
 allclean:
 		make clean
