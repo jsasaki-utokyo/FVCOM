@@ -9803,8 +9803,13 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
     TYPE(NCDIM),  POINTER, OPTIONAL :: DIM
     INTEGER, OPTIONAL :: SIZE
     TYPE(NCATT), POINTER :: ATT
-    REAL(SP),pointer :: Data_vec(:)
-    REAL(SP),pointer :: Data_scl
+!----> Siqi Li, TIME_OUT@20240406
+!    REAL(SP),pointer :: Data_vec(:)
+!    REAL(SP),pointer :: Data_scl
+    REAL(DP),pointer :: Data_vec(:)
+    REAL(DP),pointer :: Data_scl
+!<----
+
 
     IF(PRESENT(SIZE)) THEN
        ALLOCATE(DATA_vec(SIZE))
@@ -9882,6 +9887,31 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
     Data = DAYS(NOW) - DAYS(ReferenceDate)
 
   END SUBROUTINE UPDATE_FLOAT_TIME
+!====================================================================
+!====================================================================
+!----> Siqi Li, TIME_OUT@20240406
+! This subroutine is used to replace the old UPDATE_FLOAT_TIME
+  SUBROUTINE UPDATE_DOUBLE_TIME(VAR,NOW)
+    IMPLICIT NONE
+    TYPE(NCVAR),  POINTER :: VAR
+    TYPE(TIME), INTENT(in) :: NOW
+    REAL(DP), POINTER :: Data
+    LOGICAL :: TEST
+    CHARACTER(len=80):: TZONE
+
+    TEST = IS_VALID_FLOAT_DAYS(VAR,TZONE)
+    IF(.not. TEST) THEN
+       CALL PRINT_VAR(VAR)
+       call print_att_list(VAR)
+       CALL FATAL_ERROR &
+            ("CAN NOT UPDATE TIME FOR INVALID FLOATING POINT TIME VARIABLE")
+    END IF
+
+    CALL NC_POINT_VAR(VAR,Data)
+
+    Data = REAL(DAYS(NOW),DP) - REAL(DAYS(ReferenceDate),DP)
+
+  END SUBROUTINE UPDATE_DOUBLE_TIME
 !====================================================================
 !====================================================================
  FUNCTION IINT_OBJECT(DIM,size) RESULT(VAR)
