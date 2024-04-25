@@ -1275,15 +1275,11 @@ SUBROUTINE INTERNAL_STEP
 #   endif
         !end !defined (ONE_D_MODEL)                                    !                          !
 
-     IF(CASENAME(1:3) == 'gom')THEN
-        CALL VDIF_TS_GOM(1,TF1)
-     ELSE  
 #   if !defined (ONE_D_MODEL)
         CALL VDIF_TS(1,TF1)                            !Vertical Diffusion        !
 #   else
         CALL VDIF_TS(1,T1)                            !Vertical Diffusion        !
 #   endif
-     END IF
 
     
 #   if defined (MULTIPROCESSOR)
@@ -1306,11 +1302,7 @@ SUBROUTINE INTERNAL_STEP
      IF(SCALAR_POSITIVITY_CONTROL) CALL FCT_T            !Conservation Correction   !
      !#                                                   endif
 
-     IF(CASENAME(1:3) == 'gom')THEN
-        CALL VDIF_TS_GOM(1,TF1)
-     ELSE
         CALL VDIF_TS(1,TF1)                            !Vertical Diffusion
-     END IF
 
 #   if defined (MULTIPROCESSOR)
      IF(PAR)CALL AEXCHANGE(NC,MYID,NPROCS,TF1) !Interprocessor Exchange   !
@@ -1434,15 +1426,11 @@ SUBROUTINE INTERNAL_STEP
 #   endif
      !end !defined (ONE_D_MODEL)                                    !                          !
 
-     IF(CASENAME(1:3) == 'gom')THEN
-        CALL VDIF_TS_GOM(2,SF1)
-     ELSE  
 #   if !defined (ONE_D_MODEL)
         CALL VDIF_TS(2,SF1)                            !Vertical Diffusion        !
 #   else
         CALL VDIF_TS(2,S1)                            !Vertical Diffusion        !
 #   endif
-     END IF
 
 #   if defined (MULTIPROCESSOR)
      IF(PAR)CALL AEXCHANGE(NC,MYID,NPROCS,SF1) !Interprocessor Exchange   !
@@ -1465,11 +1453,7 @@ SUBROUTINE INTERNAL_STEP
      IF(SCALAR_POSITIVITY_CONTROL) CALL FCT_S       !Conservation Correction   !
      !#                                                   endif
 
-     IF(CASENAME(1:3) == 'gom')THEN
-        CALL VDIF_TS_GOM(2,SF1)
-     ELSE
         CALL VDIF_TS(2,SF1)                            !Vertical Diffusion
-     END IF
 
 #   if defined (MULTIPROCESSOR)
      IF(PAR)CALL AEXCHANGE(NC,MYID,NPROCS,SF1) !Interprocessor Exchange   !
