@@ -325,7 +325,7 @@ MODULE MOD_ENKFA
    REAL(DP)  AA, BB, DELT           ! delt =distst :the distance between two location
    REAL*8    DISTST
    REAL(DP)  HBHT                   ! HBHT: for localization 
-   REAL(DP)  RNOBS, GASDEV          ! RNobs= gasdev : random number
+   REAL(DP)  RNOBS                  ! RNobs= gasdev : random number
    REAL(DP)  AAA,SUM0,RSCALE
    REAL(DP)  ENKF_CINF2
    CHARACTER(LEN=80) TEXT 
