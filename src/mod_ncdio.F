@@ -7200,20 +7200,21 @@ CONTAINS
    
    NCF  => ADD(NCF,VAR)
    
+   IF (OLD_STYLE_TIME) THEN  !@ Siqi Li, TIME_OUT@20240429
+     ! Itime
+     VAR  => ITIME_OBJECT &
+          &(Use_MJD=use_real_world_time, &
+          & DIM=DIM_TIME)
    
-   ! Itime
-   VAR  => ITIME_OBJECT &
-        &(Use_MJD=use_real_world_time, &
-        & DIM=DIM_TIME)
+     NCF  => ADD(NCF,VAR)
    
-   NCF  => ADD(NCF,VAR)
+     ! Itime2
+     VAR => ITIME2_OBJECT &
+          &(Use_MJD=use_real_world_time, &
+          & DIM=DIM_TIME)
    
-   ! Itime2
-   VAR => ITIME2_OBJECT &
-        &(Use_MJD=use_real_world_time, &
-        & DIM=DIM_TIME)
-   
-   NCF => ADD(NCF,VAR)
+     NCF => ADD(NCF,VAR)
+   END IF  !@ Siqi Li, TIME_OUT@20240429
    
    IF (use_real_world_time) THEN
       
@@ -8498,22 +8499,23 @@ SUBROUTINE UPDATE_IODATA(NCF,NOW)
        &("UPDATE_IODATA: THE FILE OBJECT IS NOT ASSOCIATED!")
   
   VAR1 => FIND_VAR(NCF,"time",FOUND)
-!----> Siqi Li, TIME_OUT@20240406
+!@---> Siqi Li, TIME_OUT@20240406
 !  IF(FOUND) CALL UPDATE_FLOAT_TIME(VAR1,NOW)
   IF(FOUND) CALL UPDATE_DOUBLE_TIME(VAR1,NOW)
-!<----
+!@<---
 
-
-  VAR1 => FIND_VAR(NCF,"Itime",FOUND)
-  IF(FOUND) THEN
-     VAR2 => FIND_VAR(NCF,"Itime2",FOUND)
-     IF (.NOT.FOUND) THEN
-        CALL WARNING&
-             & ("FOUND ONLY PART OF INTEGER TIME VARIABLE IN OUT PUT FILE!")
-     ELSE
-        CALL UPDATE_ITIME(VAR1,VAR2,NOW)
-     END IF
-  END IF
+  IF (OLD_STYLE_TIME) THEN  !@ Siqi Li, TIME_OUT@20240429
+    VAR1 => FIND_VAR(NCF,"Itime",FOUND)
+    IF(FOUND) THEN
+       VAR2 => FIND_VAR(NCF,"Itime2",FOUND)
+       IF (.NOT.FOUND) THEN
+          CALL WARNING&
+               & ("FOUND ONLY PART OF INTEGER TIME VARIABLE IN OUT PUT FILE!")
+       ELSE
+          CALL UPDATE_ITIME(VAR1,VAR2,NOW)
+       END IF
+    END IF
+  END IF  !@ Siqi Li, TIME_OUT@20240429
 
   VAR1 => FIND_VAR(NCF,"Times",FOUND)
   IF(FOUND) CALL UPDATE_DATETIME(VAR1,NOW)

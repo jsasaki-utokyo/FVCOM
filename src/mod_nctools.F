@@ -40,6 +40,10 @@ MODULE MOD_NCTOOLS
   character(len=80), parameter :: seconds_units  ='seconds'
   character(len=80), parameter :: days_units  ='days since 0.0'
   character(len=80), parameter :: mjd_units  ='days since 1858-11-17 00:00:00'
+  !@---> Siqi Li, TIME_OUT@20240429
+  character(len=80), parameter :: time_seconds_units  ='seconds since 0.0'
+  character(len=80), parameter :: time_mjd_units  ='seconds since 1858-11-17 00:00:00'
+  !@<---
   character(len=80), parameter :: msec_units ='msec since 00:00:00'
   character(len=80), parameter :: fmat ='modified julian day (MJD)'
   character(len=80), parameter :: rfmat ='defined reference date'
@@ -9719,8 +9723,13 @@ FUNCTION IS_VALID_FLOAT_DAYS(VAR,tzone) RESULT(RES)
   ATT => find_att(VAR,'units',FOUND)
   IF(.not. FOUND) return
   
-  IF(mjd_units .eq. ATT%chr(1)(1:len_trim(mjd_units)) .or.     &
-     'days since '//trim(DATE_REFERENCE) .eq. ATT%chr(1)(1:len_trim(mjd_units))) THEN
+!@---> Siqi Li, TIME_OUT@20240429
+!  IF(mjd_units .eq. ATT%chr(1)(1:len_trim(mjd_units)) .or.     &
+!     'days since '//trim(DATE_REFERENCE) .eq. ATT%chr(1)(1:len_trim(mjd_units))) THEN
+  IF(time_mjd_units .eq. ATT%chr(1)(1:len_trim(time_mjd_units)) .or.     &
+     'seconds since '//trim(DATE_REFERENCE) .eq. ATT%chr(1)(1:len_trim(time_mjd_units))) THEN
+!@<--- 
+
 !JQI  IF(mjd_units .eq. ATT%chr(1)(1:len_trim(mjd_units)) ) THEN
        
      ATT => find_att(VAR,'format',FOUND)
@@ -9736,7 +9745,10 @@ FUNCTION IS_VALID_FLOAT_DAYS(VAR,tzone) RESULT(RES)
      IF (.not. is_valid_timezone(ATT%chr(1))) return
      tzone=TRIM(ATT%chr(1))
      
-  ELSE IF(days_units .eq. ATT%chr(1)(1:len_trim(days_units))) THEN
+!@---> Siqi Li, TIME_OUT@20240429
+!  ELSE IF(days_units .eq. ATT%chr(1)(1:len_trim(days_units))) THEN
+  ELSE IF(time_seconds_units .eq. ATT%chr(1)(1:len_trim(time_seconds_units))) THEN
+!@<---
      
      ATT => find_att(VAR,'time_zone',FOUND)
      IF(.not. FOUND) return
@@ -9803,12 +9815,12 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
     TYPE(NCDIM),  POINTER, OPTIONAL :: DIM
     INTEGER, OPTIONAL :: SIZE
     TYPE(NCATT), POINTER :: ATT
-!----> Siqi Li, TIME_OUT@20240406
+!@---> Siqi Li, TIME_OUT@20240406
 !    REAL(SP),pointer :: Data_vec(:)
 !    REAL(SP),pointer :: Data_scl
     REAL(DP),pointer :: Data_vec(:)
     REAL(DP),pointer :: Data_scl
-!<----
+!@<---
 
 
     IF(PRESENT(SIZE)) THEN
@@ -9835,7 +9847,10 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
     IF (use_mjd) THEN
       IF(DATE_REFERENCE == 'default')THEN
 
-       ATT  => NC_MAKE_ATT(name='units',values=mjd_units)
+       !@---> Siqi Li, TIME_OUT@20240429
+       !ATT  => NC_MAKE_ATT(name='units',values=mjd_units)
+       ATT  => NC_MAKE_ATT(name='units',values=time_mjd_units)
+       !@<---
        VAR  => ADD(VAR,ATT)
        
        ATT  => NC_MAKE_ATT(name='format',values=fmat)
@@ -9843,7 +9858,10 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
 
       ELSE
 
-       ATT  => NC_MAKE_ATT(name='units',values='days since '//trim(DATE_REFERENCE))
+       !@---> Siqi Li, TIME_OUT@20240429
+       !ATT  => NC_MAKE_ATT(name='units',values='days since '//trim(DATE_REFERENCE))
+       ATT  => NC_MAKE_ATT(name='units',values='seconds since '//trim(DATE_REFERENCE))
+       !@<---
        VAR  => ADD(VAR,ATT)
        
        ATT  => NC_MAKE_ATT(name='format',values=rfmat)
@@ -9855,7 +9873,10 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
        VAR  => ADD(VAR,ATT)
        
     ELSE
-       ATT  => NC_MAKE_ATT(name='units',values=days_units)
+       !@---> Siqi Li, TIME_OUT@20240429
+       !ATT  => NC_MAKE_ATT(name='units',values=days_units)
+       ATT  => NC_MAKE_ATT(name='units',values=time_seconds_units)
+       !@<---
        VAR  => ADD(VAR,ATT)       
        
        ATT  => NC_MAKE_ATT(name='time_zone',values='none') 
@@ -9889,7 +9910,7 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
   END SUBROUTINE UPDATE_FLOAT_TIME
 !====================================================================
 !====================================================================
-!----> Siqi Li, TIME_OUT@20240406
+!@---> Siqi Li, TIME_OUT@20240406
 ! This subroutine is used to replace the old UPDATE_FLOAT_TIME
   SUBROUTINE UPDATE_DOUBLE_TIME(VAR,NOW)
     IMPLICIT NONE
@@ -9910,6 +9931,7 @@ END FUNCTION IS_VALID_FLOAT_SECONDS
     CALL NC_POINT_VAR(VAR,Data)
 
     Data = REAL(DAYS(NOW),DP) - REAL(DAYS(ReferenceDate),DP)
+    Data = Data * 24._DP * 3600._DP  ! Convert unit from day to second
 
   END SUBROUTINE UPDATE_DOUBLE_TIME
 !====================================================================
