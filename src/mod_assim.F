@@ -4797,13 +4797,17 @@ IF(MSR)THEN
 !            F_SPATIAL = 1.0_SP
 !          ENDIF
 
-          IF(H(I)<=200.0_SP) THEN
-            F_SPATIAL = 0.0_SP
-          ELSE IF (H(I)>200.0_SP .AND. H(I)<=1000.0_SP) THEN
-            F_SPATIAL = (H(I)-200.0_SP)/800.0_SP
-          ELSE
-            F_SPATIAL = 1.0_SP
-          ENDIF
+!@---> Siqi Li, SSH@20240501
+! Remove the SSH control factor on depth 
+!          IF(H(I)<=200.0_SP) THEN
+!            F_SPATIAL = 0.0_SP
+!          ELSE IF (H(I)>200.0_SP .AND. H(I)<=1000.0_SP) THEN
+!            F_SPATIAL = (H(I)-200.0_SP)/800.0_SP
+!          ELSE
+!            F_SPATIAL = 1.0_SP
+!          ENDIF
+          F_SPATIAL = 1.0_SP
+!@<---
 !qxu}
 
       IF(IntTime>SSH_SAVE_TIME .AND. IntTime<= SSH_SAVE_TIME + SSH_SAVE_INTERVAL/2 ) THEN
