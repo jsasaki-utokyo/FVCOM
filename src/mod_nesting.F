@@ -2343,7 +2343,10 @@ END SUBROUTINE GENMAP_NESTING
                 VAR1%SCL_FLT => VAR1%VEC_FLT(J)
 # endif		
                 IF (J <= CNT) THEN
-                   CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
+                   !@---> Siqi Li, TIME_OUT@20240429
+                   !CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
+                   CALL UPDATE_DOUBLE_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
+                   !!<---
                 ELSE
 # if defined (DOUBLE_PRECISION)
                    VAR1%SCL_DBL = 0
@@ -2503,7 +2506,10 @@ END SUBROUTINE GENMAP_NESTING
                 VAR1%SCL_FLT => VAR1%VEC_FLT(J)
 # endif		
                 IF (J <= CNT) THEN
-                   CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
+                   !@---> Siqi Li, TIME_OUT@20240429
+                   !CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
+                   CALL UPDATE_DOUBLE_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
+                   !@<---
                 ELSE
 # if defined (DOUBLE_PRECISION)
                    VAR1%SCL_DBL = 0
@@ -4393,6 +4399,32 @@ END SUBROUTINE GENMAP_NESTING
   END SUBROUTINE UPDATE_FLOAT_TIME_NEST
 !====================================================================
 !====================================================================
+!@---> Siqi Li, TIME_OUT@20240406
+! This subroutine is used to replace the old UPDATE_FLOAT_TIME_NEST
+  SUBROUTINE UPDATE_DOUBLE_TIME_NEST(VAR,NOW)
+    IMPLICIT NONE
+    TYPE(NCVAR),  POINTER :: VAR
+    TYPE(TIME), INTENT(in) :: NOW
+    REAL(SP), POINTER :: Data
+    LOGICAL :: TEST
+    CHARACTER(len=80):: TZONE
+
+    TEST = IS_VALID_FLOAT_DAYS(VAR,TZONE)
+    IF(.not. TEST) THEN
+       CALL PRINT_VAR(VAR)
+       call print_att_list(VAR)
+       CALL FATAL_ERROR &
+            ("CAN NOT UPDATE TIME FOR INVALID FLOATING POINT TIME VARIABLE")
+    END IF
+
+    CALL NC_POINT_VAR(VAR,Data)
+    
+    Data = REAL(DAYS(NOW),DP) !- REAL(DAYS(ReferenceDate),DP)
+    Data = Data * 24._DP * 3600._DP  ! Convert unit from day to second
+
+  END SUBROUTINE UPDATE_DOUBLE_TIME_NEST
+!====================================================================
+!====================================================================
  FUNCTION Float_time_OBJECT_NEST(use_mjd,DIM,size) RESULT(VAR)
     IMPLICIT NONE
     TYPE(NCVAR),  POINTER :: VAR
@@ -4400,8 +4432,12 @@ END SUBROUTINE GENMAP_NESTING
     TYPE(NCDIM),  POINTER, OPTIONAL :: DIM
     INTEGER, OPTIONAL :: SIZE
     TYPE(NCATT), POINTER :: ATT
-    REAL(SP),pointer :: Data_vec(:)
-    REAL(SP),pointer :: Data_scl
+!@---> Siqi Li, TIME_OUT@20240406
+!    REAL(SP),pointer :: Data_vec(:)
+!    REAL(SP),pointer :: Data_scl
+    REAL(DP),pointer :: Data_vec(:)
+    REAL(DP),pointer :: Data_scl
+!@<---
 
     IF(PRESENT(SIZE)) THEN
        ALLOCATE(DATA_vec(SIZE))
@@ -4425,9 +4461,13 @@ END SUBROUTINE GENMAP_NESTING
     VAR  => ADD(VAR,ATT)
     
     IF (use_mjd) THEN
-       ATT  => NC_MAKE_ATT(name='units',values=mjd_units)
-       VAR  => ADD(VAR,ATT)
-       
+
+       !@---> Siqi Li, TIME_OUT@20240429
+       !ATT  => NC_MAKE_ATT(name='units',values=mjd_units)
+       ATT  => NC_MAKE_ATT(name='units',values=time_mjd_units)
+       !@<---
+       VAR  => ADD(VAR,ATT)   
+    
        ATT  => NC_MAKE_ATT(name='format',values=fmat)
        VAR  => ADD(VAR,ATT)
 
@@ -4435,7 +4475,10 @@ END SUBROUTINE GENMAP_NESTING
        VAR  => ADD(VAR,ATT)
        
     ELSE
-       ATT  => NC_MAKE_ATT(name='units',values=days_units)
+       !@---> Siqi Li, TIME_OUT@20240429
+       !ATT  => NC_MAKE_ATT(name='units',values=days_units)
+       ATT  => NC_MAKE_ATT(name='units',values=time_seconds_units)
+       !@<---
        VAR  => ADD(VAR,ATT)       
        
        ATT  => NC_MAKE_ATT(name='time_zone',values='none') 
