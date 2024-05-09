@@ -2337,16 +2337,19 @@ END SUBROUTINE GENMAP_NESTING
           VAR1 => FIND_VAR(NCF,"time",FOUND)
           IF(FOUND) THEN
              DO J=1,NCNEST_BLOCKSIZE
-# if defined (DOUBLE_PRECISION)
+!@---> Siqi Li, TIME_OUT@20240429
+!# if defined (DOUBLE_PRECISION)
+!                VAR1%SCL_DBL => VAR1%VEC_DBL(J)
+!# else
+!                VAR1%SCL_FLT => VAR1%VEC_FLT(J)
+!# endif		
                 VAR1%SCL_DBL => VAR1%VEC_DBL(J)
-# else
-                VAR1%SCL_FLT => VAR1%VEC_FLT(J)
-# endif		
+!@<---
                 IF (J <= CNT) THEN
                    !@---> Siqi Li, TIME_OUT@20240429
                    !CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
                    CALL UPDATE_DOUBLE_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
-                   !!<---
+                   !@<---
                 ELSE
 # if defined (DOUBLE_PRECISION)
                    VAR1%SCL_DBL = 0
@@ -2500,11 +2503,15 @@ END SUBROUTINE GENMAP_NESTING
           VAR1 => FIND_VAR(NCF1,"time",FOUND)
           IF(FOUND) THEN
              DO J=1,NCNEST_BLOCKSIZE_WAVE
-# if defined (DOUBLE_PRECISION)
+!@---> Siqi Li, TIME_OUT@20240429             
+!# if defined (DOUBLE_PRECISION)
+!                VAR1%SCL_DBL => VAR1%VEC_DBL(J)
+!# else
+!                VAR1%SCL_FLT => VAR1%VEC_FLT(J)
+!# endif	
                 VAR1%SCL_DBL => VAR1%VEC_DBL(J)
-# else
-                VAR1%SCL_FLT => VAR1%VEC_FLT(J)
-# endif		
+!@<---
+                VAR1%SCL_DBL => VAR1%VEC_DBL(J)
                 IF (J <= CNT) THEN
                    !@---> Siqi Li, TIME_OUT@20240429
                    !CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
