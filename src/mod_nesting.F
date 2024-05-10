@@ -2351,11 +2351,14 @@ END SUBROUTINE GENMAP_NESTING
                    CALL UPDATE_DOUBLE_TIME_NEST(VAR1,NCNEST_DATA(I)%TIME_BLK(J))
                    !@<---
                 ELSE
-# if defined (DOUBLE_PRECISION)
+!@---> Siqi Li, TIME_OUT@20240429
+!# if defined (DOUBLE_PRECISION)
+!                   VAR1%SCL_DBL = 0
+!# else
+!                   VAR1%SCL_FLT = 0
+!# endif		
                    VAR1%SCL_DBL = 0
-# else
-                   VAR1%SCL_FLT = 0
-# endif		
+!<---
                 END IF
              END DO
           END IF
@@ -2511,18 +2514,20 @@ END SUBROUTINE GENMAP_NESTING
 !# endif	
                 VAR1%SCL_DBL => VAR1%VEC_DBL(J)
 !@<---
-                VAR1%SCL_DBL => VAR1%VEC_DBL(J)
                 IF (J <= CNT) THEN
                    !@---> Siqi Li, TIME_OUT@20240429
                    !CALL UPDATE_FLOAT_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
                    CALL UPDATE_DOUBLE_TIME_NEST(VAR1,NCNEST_DATA_WAVE(I)%TIME_BLK(J))
                    !@<---
                 ELSE
-# if defined (DOUBLE_PRECISION)
+!@---> Siqi Li, TIME_OUT@20240429
+!# if defined (DOUBLE_PRECISION)
+!                   VAR1%SCL_DBL = 0
+!# else
+!                   VAR1%SCL_FLT = 0
+!# endif		
                    VAR1%SCL_DBL = 0
-# else
-                   VAR1%SCL_FLT = 0
-# endif		
+!@<---
                 END IF
              END DO
           END IF
