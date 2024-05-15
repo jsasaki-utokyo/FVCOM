@@ -69,6 +69,10 @@
    LOGICAL  :: ISMATCH
 !#  endif
 
+#  if defined (SPHERICAL)
+   REAL(DP) :: XTMP,XTMP1  !@AJ, LIMITATION@20240515
+#  endif
+
 #  if defined (LIMITED_NO)
    REAL(SP) :: UIJ1,VIJ1,UIJ2,VIJ2,FXX,FYY
 #  else
