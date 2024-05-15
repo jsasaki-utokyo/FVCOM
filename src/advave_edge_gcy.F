@@ -59,11 +59,11 @@
 
 #  if defined (SPHERICAL)
    REAL(DP) :: XTMP,XTMP1
-#  endif      
+#  endif     
 
 #  if defined (LIMITED_NO)
    REAL(SP) :: UIJ1,VIJ1,UIJ2,VIJ2,FXX,FYY
-#  else
+#  else 
    REAL(SP),ALLOCATABLE,DIMENSION(:) :: UIJ1,VIJ1,UIJ2,VIJ2,FXX,FYY
    REAL(SP),ALLOCATABLE,DIMENSION(:) :: UALFA,VALFA
    REAL(SP) :: UALFA_TMP,VALFA_TMP

@@ -346,6 +346,7 @@ MODULE MOD_STATION_TIMESERIES
    real(sp), allocatable :: ftemp(:)
    integer :: VARID
    REAL(SP) :: KDD_TMP
+   REAL(DP) :: KDD_TMP_DOUBLE  !@ Siqi Li, TIME_OUT@20240515
 
 !------------------------------------------------------------------------------!
 !  WRITE TO FILES (SERIAL EXECUTION)                                           !
@@ -380,7 +381,11 @@ MODULE MOD_STATION_TIMESERIES
        KDD1%MuSOD = KDD%MuSOD + THOUR * 3600 - INT((KDD%MuSOD/3600.+THOUR)/24.0) * 24 * 3600
        KDD_TMP = KDD1%MJD + KDD1%MuSOD/86400.0
 
-       ierr    = nf90_put_var(nc_ofid,time_s_vid,kdd_tmp,START=dims)
+!@---> Siqi Li, TIME_OUT@20240515
+       !ierr    = nf90_put_var(nc_ofid,time_s_vid,kdd_tmp,START=dims)
+       KDD_TMP_DOUBLE = KDD_TMP * 24._DP * 3600._DP
+       ierr    = nf90_put_var(nc_ofid,time_s_vid,KDD_TMP_DOUBLE,START=dims)
+!@<--- 
        if(ierr /= nf90_noerr)then
          call handle_ncerr(ierr,"error writing variable to netcdf")
        end if
@@ -726,20 +731,32 @@ NETCDF_TIMESTRING = 'seconds after 00:00:00'
 
 !--Define Model Time Variables and Attributes    
     IF(USE_REAL_WORLD_TIME)THEN
-      ierr = nf90_def_var(nc_ofid,"time",nf90_float,dynmtime,time_s_vid)
+!@---> Siqi Li, TIME_OUT@20240515
+      !ierr = nf90_def_var(nc_ofid,"time",nf90_float,dynmtime,time_s_vid)
+      ierr = nf90_def_var(nc_ofid,"time",nf90_double,dynmtime,time_s_vid)
+!@<---
       ierr = nf90_put_att(nc_ofid,time_s_vid,"long_name","time")
       if(DATE_REFERENCE == 'default')then
-        ierr = nf90_put_att(nc_ofid,time_s_vid,"units",trim("days since 1858-11-17 00:00:00"))
+!@---> Siqi Li, TIME_OUT@20240515
+        !ierr = nf90_put_att(nc_ofid,time_s_vid,"units",trim("days since 1858-11-17 00:00:00"))
+        ierr = nf90_put_att(nc_ofid,time_s_vid,"units",trim("seconds since 1858-11-17 00:00:00"))
+!@<---
         ierr = nf90_put_att(nc_ofid,time_s_vid,"format",trim("modified julian day (MJD)"))
       else
-        ierr = nf90_put_att(nc_ofid,time_s_vid,"units","days since "//trim(DATE_REFERENCE))
+!@---> Siqi Li, TIME_OUT@20240515
+        !ierr = nf90_put_att(nc_ofid,time_s_vid,"units","days since "//trim(DATE_REFERENCE))
+        ierr = nf90_put_att(nc_ofid,time_s_vid,"units","seconds since "//trim(DATE_REFERENCE))
+!@<---
         ierr = nf90_put_att(nc_ofid,time_s_vid,"format",trim("defined reference date"))
       end if
 !JQI      ierr = nf90_put_att(nc_ofid,time_s_vid,"calendar","none")
       ierr = nf90_put_att(nc_ofid,time_s_vid,"time_zone","UTC")
 
     ELSE
-      ierr = nf90_def_var(nc_ofid,"time",nf90_float,dynmtime,time_s_vid)
+!@---> Siqi Li, TIME_OUT@20240515
+      !ierr = nf90_def_var(nc_ofid,"time",nf90_float,dynmtime,time_s_vid)
+      ierr = nf90_def_var(nc_ofid,"time",nf90_double,dynmtime,time_s_vid)
+!@<---
       ierr = nf90_put_att(nc_ofid,time_s_vid,"long_name","time")
       ierr = nf90_put_att(nc_ofid,time_s_vid,"units",trim(netcdf_timestring))
 !JQI      ierr = nf90_put_att(nc_ofid,time_s_vid,"calendar","none")
