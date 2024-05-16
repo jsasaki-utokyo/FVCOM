@@ -3966,7 +3966,10 @@ SUBROUTINE NC_DEF_VAR(NCF,varid)
 
 #if defined DOUBLE_PRECISION && SINGLE_OUTPUT
 
-  IF(VAR%xtype == NF90_DOUBLE) THEN
+!@---> Siqi Li, TIME_OUT@20240515
+!  IF(VAR%xtype == NF90_DOUBLE) THEN
+   IF(VAR%xtype == NF90_DOUBLE .AND. TRIM(VAR%VARNAME) .NE. 'time') THEN
+!<---
      
      status = nf90_def_var(NCF%ncid, trim(VAR%varname), NF90_FLOAT,&
           & dimids, i)
