@@ -383,7 +383,7 @@ MODULE MOD_STATION_TIMESERIES
 
 !@---> Siqi Li, TIME_OUT@20240515
        !ierr    = nf90_put_var(nc_ofid,time_s_vid,kdd_tmp,START=dims)
-       KDD_TMP_DOUBLE = KDD_TMP * 24._DP * 3600._DP
+       KDD_TMP_DOUBLE = KDD1%MJD * 86400.0_DP + KDD1%MuSOD
        ierr    = nf90_put_var(nc_ofid,time_s_vid,KDD_TMP_DOUBLE,START=dims)
 !@<--- 
        if(ierr /= nf90_noerr)then
