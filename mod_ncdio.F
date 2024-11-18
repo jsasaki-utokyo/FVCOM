@@ -389,6 +389,7 @@ CONTAINS
        write(IPT,*)"!=============================================================="
     END IF
 
+   print*, 'STOP IN INIT_NCDIO'
 
   END SUBROUTINE INIT_NCDIO
 !=============================================================  
@@ -650,9 +651,12 @@ CONTAINS
        
 #   if defined (WATER_QUALITY)
        IF(NC_WQM)THEN
+         print*,'STOP HERE   ???.................'
           NCF2 => WQM_FILE_OBJECT()
+         print*,'STOP HERE   ???.................1'
           NCF => ADD(NCF,NCF2)
 !!$          NCF => ADD(NCF,WQM_FILE_OBJECT() )
+         print*,'STOP HERE   ???.................2'
        END IF
 #   endif      
 
@@ -776,6 +780,7 @@ CONTAINS
             &("LOGICAL ERROR IN SETUP_DATFILE")
     END IF
 
+         print*,'STOP HERE   ???.................3'
     IF(DBG_SET(DBG_SBR)) WRITE(IPT,*) "END SETUP_DATAFILE"
   END SUBROUTINE SETUP_DATFILE
 !=============================================================  
@@ -7200,6 +7205,7 @@ CONTAINS
    TYPE(NCVAR),  POINTER :: VAR
    TYPE(NCATT),  POINTER :: ATT
    INTEGER :: II
+!   REAL(SPA),ALLOCATABLE :: WQM_TMP(:,:)
    REAL(SP),POINTER :: WQM_TMP(:,:)
 
    IF(DBG_SET(DBG_SBR)) WRITE(IPT,*) "START WQM_FILE_OBJECT"
@@ -7222,7 +7228,6 @@ CONTAINS
 
    DO II = 1,NB
      WQM_TMP => WQM(1:M,1:KB,II)
-
   ! WQM
     
      VAR  => NC_MAKE_PVAR(name=TRIM(WQM_NAME(II,1)),&
@@ -7230,6 +7235,9 @@ CONTAINS
 
      ATT  => NC_MAKE_ATT(name='long_name',values=TRIM(WQM_NAME(II,3))) 
      VAR  => ADD(VAR,ATT)
+
+!    ATT  => NC_MAKE_ATT(name='standard_name',values='sea_water_temperature') 
+!    VAR  => ADD(VAR,ATT)
 
      ATT  => NC_MAKE_ATT(name='units',values=TRIM(WQM_NAME(II,2))) 
      VAR  => ADD(VAR,ATT)
@@ -7246,6 +7254,7 @@ CONTAINS
      NCF  => ADD(NCF,VAR)
   
      NULLIFY(WQM_TMP)
+!     DEALLOCATE(WQM_TMP)
    END DO
 
    IF(DBG_SET(DBG_SBR)) WRITE(IPT,*) "END WQM_FILE_OBJECT"
